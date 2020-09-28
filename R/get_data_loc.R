@@ -1,0 +1,49 @@
+#' Extract Human Development Index Data
+#'
+#' Fetch data from the UNDP Human Development Report from Data package
+#' #' Fetch data from the UNDP Human Development Report
+#'
+#' @param indicator Numerical or character vector with the indicator id (see details)
+#' @param country Character vector
+#' @param year Numerical vector (see details for which years are available)
+#'
+#' The function fetches data from the \href{http://hdr.undp.org}{United Nations
+#' Development Programme Human Development Report} API.
+#'
+#' A dimension can be left as NULL (the default) to get all data for that
+#' dimension. The package includes a data frame (\code{hdr_indicators}) with the
+#' IDs and human-readable names of the indicators.
+#'
+#' If the year parameter is not left as NULL, it must be on of the following:
+#' 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2011, 2012, 2013.
+#'
+#' @author Dhafer Malouche
+#' @return A data frame
+#' @examples
+#' # Get the Human Development Index for Germany in 2013
+#' df <- get_data(indicator = 137506, country = "TUN", year = 2013)
+#' head(df)
+#'
+#' # Leave a dimension as NULL (default) to get all values for that dimension
+#' # e.g. all countries and all year for a specific indicator:
+#' df <- get_data(103606)
+#' head(df)
+#'
+#'#' @import  dplyr
+#'#' @export
+
+
+get_data_loc <- function(indicator = NULL, country = NULL, year = NULL) {
+
+  if(!is.null(year) && !year %in% c(seq(1980, 2010, 5), 2011:2013)) {
+    stop("Year must be one of: 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2011, 2012, 2013")
+  }
+
+  params <- list(indicator_id = indicator, country_code = country, year = year)
+  data(df)
+  X=df
+  require(dplyr)
+  X=X%>%filter(indicator_id%in%params[[1]])%>%filter(country_code%in%params[[2]])%>%
+    filter(year%in%params[[3]])
+  return(X)
+}
